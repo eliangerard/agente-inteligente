@@ -265,11 +265,11 @@ export const App = () => {
 												((x == gumpy.x || x == gumpy.x + 1 || x == gumpy.x - 1) && (y == gumpy.y || y == gumpy.y - 1 || y == gumpy.y + 1)) ? "#5d369c" : "white")
 										}}
 									>
-										{agl.x === x && agl.y === y ? "A" : ""}
-										{treasure.x === x && treasure.y === y ? "T" : ""}
-										{well.x === x && well.y === y ? "W" : ""}
-										{secondWell.x === x && secondWell.y === y ? "W" : ""}
-										{gumpy.x === x && gumpy.y === y ? "G" : ""}
+										{agl.x === x && agl.y === y ? "🤖" : ""}
+										{treasure.x === x && treasure.y === y ? "🎁" : ""}
+										{well.x === x && well.y === y ? "🌀" : ""}
+										{secondWell.x === x && secondWell.y === y ? "🌀" : ""}
+										{gumpy.x === x && gumpy.y === y ? "👹" : ""}
 										<button className="w-full h-full" onClick={() => setAgl({ x, y })}></button>
 									</div>
 								)
