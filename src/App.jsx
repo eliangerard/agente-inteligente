@@ -63,7 +63,7 @@ export const App = () => {
 
 	const addLog = (log, style) => {
 		const date = new Date();
-		logs.push({ content: date.toLocaleString() + " - " + log, style });
+		logs.unshift({ content: date.toLocaleString() + " - " + log, style });
 		// divLogs.current.scrollTop = divLogs.current.scrollHeight;
 	}
 
@@ -109,7 +109,7 @@ export const App = () => {
 
 			x = moveX ? Math.round(Math.random() * 2 - 1) : 0;
 			y = moveX ? 0 : Math.round(Math.random() * 2 - 1);
-
+			
 			console.log("Agente", x, y);
 			cycles++;
 		} while (
@@ -186,7 +186,9 @@ export const App = () => {
 			// Expresión para evitar que Gumpy entre a los pozos
 			(x + gumpy.x === well.x && y + gumpy.y === well.y) || (x + gumpy.x === secondWell.x && y + gumpy.y === secondWell.y) || (x + gumpy.x === agl.x && y + gumpy.y === agl.y) ||
 			// Expresión para que Gumpy se acerque al agente
-			(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0))
+			(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0)) ||
+			//Expresión para que Gumpy evite el tesoro
+			(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y)
 		);
 
 		setGumpy(gumpy => ({
@@ -313,9 +315,9 @@ export const App = () => {
 					</div>
 					<h2>Mensajes</h2>
 					<div className="w-full mb-40 max-h-80 mr-40 overflow-y-auto">
-						<div ref={divLogs} className="w-full flex overflow-hidden flex-col-reverse p-5 bg-zinc-200">
+						<div ref={divLogs} className="w-full flex flex-col-reverse p-5 bg-zinc-200">
 							{
-								logs.reverse().map((message, i) => <p className="italic" style={message.style} key={i}>{message.content}</p>)
+								logs.map((message, i) => <p className="italic" style={message.style} key={i}>{message.content}</p>)
 							}
 						</div>
 					</div>
