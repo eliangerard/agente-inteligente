@@ -126,7 +126,6 @@ export const App = () => {
 			score += 1000;
 			setPause(true);
 			addLog("¡El agente encontró el tesoro!", { color: "#00AA00", fontWeight: "bold" });
-			clearTimeout(timer);
 		}
 		if (agl.x + x === well.x && agl.y + y === well.y ||
 			agl.x + x === secondWell.x && agl.y + y === secondWell.y) {
@@ -225,26 +224,59 @@ export const App = () => {
 		setGumpy(gumpy)
 	}
 
+	const siguiente = () => {
+		setAgl(prevState => ({
+			...prevState,
+			x: 0,
+			y: 0,
+		}));
+		setPause(false);
+
+		let treasure, well, secondWell, gumpy;
+		do {
+			well = initializeLocation()
+			secondWell = initializeLocation()
+			gumpy = initializeLocation()
+			treasure = initializeLocation()
+		} while (
+			treasure.x === well.x && treasure.y === well.y ||
+			treasure.x === secondWell.x && treasure.y === secondWell.y ||
+			well.x === secondWell.x && well.y === secondWell.y ||
+			gumpy.x === treasure.x && gumpy.y === treasure.y ||
+			gumpy.x === well.x && gumpy.y === well.y ||
+			gumpy.x === secondWell.x && gumpy.y === secondWell.y
+		);
+
+		setTreasure(treasure)
+		setWell(well)
+		setSecondWell(secondWell)
+		setGumpy(gumpy)
+	}
+
 	return (
 		<div className="w-screen h-screen">
 			<div className="flex justify-between w-screen">
-				<div className="w-2/3">
+				<div className="w-auto h-screen p-40">
 					{
 						[...Array(5)].map((_, y) => {
 							const rows = [...Array(5)].map((_, x) => {
 								return (
-									<div key={`${x}:${y}`} className="border-2 border-black w-10 h-10"
+									<div key={`${x}:${y}`} className="border-2 border-black w-28 h-28 text-4xl flex justify-between align-middle"
 										style={{
 											backgroundColor: ((x == agl.x || x == agl.x + 1 || x == agl.x - 1) && (y == agl.y || y == agl.y - 1 || y == agl.y + 1)) ? "#369c36" : (
 												((x == gumpy.x || x == gumpy.x + 1 || x == gumpy.x - 1) && (y == gumpy.y || y == gumpy.y - 1 || y == gumpy.y + 1)) ? "#5d369c" : "white")
 										}}
 									>
-										{agl.x === x && agl.y === y ? "A" : ""}
-										{treasure.x === x && treasure.y === y ? "T" : ""}
-										{well.x === x && well.y === y ? "W" : ""}
-										{secondWell.x === x && secondWell.y === y ? "W" : ""}
-										{gumpy.x === x && gumpy.y === y ? "G" : ""}
-										<button className="w-full h-full" onClick={() => setAgl({ x, y })}></button>
+										<div className="flex justify-center items-center w-full">
+											<p class="text-center">
+												{agl.x === x && agl.y === y ? "🤖" : ""}
+												{treasure.x === x && treasure.y === y ? "🎁" : ""}
+												{well.x === x && well.y === y ? "🌀" : ""}
+												{secondWell.x === x && secondWell.y === y ? "🌀" : ""}
+												{gumpy.x === x && gumpy.y === y ? "👹" : ""}
+											</p>
+											<button className="" onClick={() => setAgl({ x, y })}></button>
+										</div>
 									</div>
 								)
 							})
@@ -256,31 +288,36 @@ export const App = () => {
 						})
 					}
 				</div>
-				<div className="w-1/3">
-					<p>Turno: {turn}</p>
-					<p>Puntaje: {agl.score}</p>
-					<label>Velocidad: {gameSpeed}</label>
-					<input
-						className="border-2 border-black"
-						type="range"
-						min={100}
-						max={2000}
-						value={gameSpeed}
-						onChange={(e) => setGameSpeed(e.target.value)}
-					/>
-					<br />
-					<button onClick={() => setPause(!pause)}>{pause ? "Reanudar" : "Pausar"}</button>
-					<br />
-					<button onClick={restart}>Reiniciar</button>
+				<div className="w-full h-screen pr-40">
+					<div className="w-full pb-10 pt-40">
+						<p>Turno: {turn}</p>
+						<p>Puntaje: {agl.score}</p>
+						<label>Velocidad: {gameSpeed}</label>
+						<input
+							className="border-2 border-black"
+							type="range"
+							min={100}
+							max={2000}
+							value={gameSpeed}
+							onChange={(e) => setGameSpeed(e.target.value)}
+						/>
+						<br />
+						<button onClick={() => setPause(!pause)}>{pause ? "Reanudar" : "Pausar"}</button>
+						<br />
+						<button onClick={restart}>Reiniciar</button>
+						<br />
+						<button onClick={siguiente}>Siguiente</button>
+					</div>
+					<h2>Mensajes</h2>
+					<div className="w-full mb-40 max-h-80 mr-40 overflow-y-auto">
+						<div ref={divLogs} className="w-full flex overflow-hidden flex-col-reverse p-5 bg-zinc-200">
+							{
+								logs.reverse().map((message, i) => <p className="italic" style={message.style} key={i}>{message.content}</p>)
+							}
+						</div>
+					</div>
 				</div>
-			</div>
-			<div className="h-2/3">
-				<h2>Mensajes</h2>
-				<div ref={divLogs} className="w-full overflow-y-scroll h-2/3 flex flex-col-reverse">
-					{
-						logs.reverse().map((message, i) => <p className="italic" style={message.style} key={i}>{message.content}</p>)
-					}
-				</div>
+
 			</div>
 		</div>
 	)
