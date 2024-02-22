@@ -126,7 +126,6 @@ export const App = () => {
 			score += 1000;
 			setPause(true);
 			addLog("¡El agente encontró el tesoro!", { color: "#00AA00", fontWeight: "bold" });
-			clearTimeout(timer);
 		}
 		if (agl.x + x === well.x && agl.y + y === well.y ||
 			agl.x + x === secondWell.x && agl.y + y === secondWell.y) {
@@ -223,6 +222,35 @@ export const App = () => {
 		setGumpy(gumpy)
 	}
 
+	const siguiente = () => {
+		setAgl(prevState => ({
+			...prevState,
+			x: 0,
+			y: 0,
+		}));
+		setPause(false);
+
+		let treasure, well, secondWell, gumpy;
+		do {
+			well = initializeLocation()
+			secondWell = initializeLocation()
+			gumpy = initializeLocation()
+			treasure = initializeLocation()
+		} while (
+			treasure.x === well.x && treasure.y === well.y ||
+			treasure.x === secondWell.x && treasure.y === secondWell.y ||
+			well.x === secondWell.x && well.y === secondWell.y ||
+			gumpy.x === treasure.x && gumpy.y === treasure.y ||
+			gumpy.x === well.x && gumpy.y === well.y ||
+			gumpy.x === secondWell.x && gumpy.y === secondWell.y
+		);
+
+		setTreasure(treasure)
+		setWell(well)
+		setSecondWell(secondWell)
+		setGumpy(gumpy)
+	}
+
 	return (
 		<div className="w-screen h-screen">
 			<div className="flex justify-between w-screen">
@@ -270,6 +298,8 @@ export const App = () => {
 					<button onClick={() => setPause(!pause)}>{pause ? "Reanudar" : "Pausar"}</button>
 					<br />
 					<button onClick={restart}>Reiniciar</button>
+					<br/>
+					<button onClick={siguiente}>Siguiente</button>
 				</div>
 			</div>
 			<div className="h-2/3">
