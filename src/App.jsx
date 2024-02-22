@@ -62,7 +62,7 @@ export const App = () => {
 
 	const addLog = (log, style) => {
 		const date = new Date();
-		logs.push({ content: date.toLocaleString() + " - " + log, style });
+		logs.unshift({ content: date.toLocaleString() + " - " + log, style });
 		// divLogs.current.scrollTop = divLogs.current.scrollHeight;
 	}
 
@@ -310,9 +310,9 @@ export const App = () => {
 					</div>
 					<h2>Mensajes</h2>
 					<div className="w-full mb-40 max-h-80 mr-40 overflow-y-auto">
-						<div ref={divLogs} className="w-full flex overflow-hidden flex-col-reverse p-5 bg-zinc-200">
+						<div ref={divLogs} className="w-full flex flex-col-reverse p-5 bg-zinc-200">
 							{
-								logs.reverse().map((message, i) => <p className="italic" style={message.style} key={i}>{message.content}</p>)
+								logs.map((message, i) => <p className="italic" style={message.style} key={i}>{message.content}</p>)
 							}
 						</div>
 					</div>
