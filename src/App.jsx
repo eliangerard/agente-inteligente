@@ -14,6 +14,17 @@ let logs = [];
 
 let timer;
 
+let treasure = { x: 0, y: 0 };
+let well = { x: 0, y: 0 };
+let secondWell = { x: 0, y: 0 };
+let gumpy = { x: 0, y: 0 };
+let agl = {
+	x: 0,
+	y: 0,
+	score: 0,
+};
+
+let cont2 = 0;
 export const App = () => {
 	const tolerance = 100;
 	const divLogs = useRef(null);
@@ -23,18 +34,11 @@ export const App = () => {
 	// Solo se pueden editar usando su respectiva función set{Nombre}.
 	const [turn, setTurn] = useState(0);
 	const [gameSpeed, setGameSpeed] = useState(1000);
-
-	const [agl, setAgl] = useState({
-		x: 0,
-		y: 0,
-		score: 0,
-	});
-
-	const [treasure, setTreasure] = useState({ x: 0, y: 0 });
-	const [well, setWell] = useState({ x: 0, y: 0 });
-	const [secondWell, setSecondWell] = useState({ x: 0, y: 0 });
-	const [gumpy, setGumpy] = useState({ x: 0, y: 0 });
 	const [pause, setPause] = useState(false);
+
+
+	const [cont, setCont] = useState(0);
+
 
 	// useEffect es un hook que se ejecuta después de cada renderizado, es decir, después de cada vez que el componente se actualiza.
 	useEffect(() => {
@@ -47,18 +51,12 @@ export const App = () => {
 			clearTimeout(timer);
 		else
 			timer = setTimeout(() => {
-				moveAgl()
 				if (turn % 2 == 0)
 					moveGumpy();
+				moveAgl();
 			}, gameSpeed);
 	}, [turn, pause]);
 	// ⬆ El array de dependencias indica que esta sección de código se ejecutará cada vez que el valor de alguna de las variables que se encuentran en el array cambie.
-
-	useEffect(() => {
-		addLog(`El agente se movió a [${agl.x}:${agl.y}]`, { color: "#369c36" });
-		if (agl.x != treasure.x && agl.y != treasure.y)
-			addLog(`Gumpy se movió a [${gumpy.x}:${gumpy.y}]`, { color: "#5d369c" });
-	}, [agl, gumpy])
 
 	const addLog = (log, style) => {
 		const date = new Date();
@@ -90,14 +88,13 @@ export const App = () => {
 
 		do {
 			if (cycles > tolerance) {
-				setPause(true);
 				addLog("El agente no puede moverse", { color: "#FF0000", fontWeight: "bold" });
-				break;
+				return endGame();
 			}
 			let moveX;
 
 			// Expresión para que si el agente detecta el tesoro se mueva hacia él
-			if (isTreasureNear) {
+			if (isTreasureNear && !isWellNear && !isSecondWellNear && !isGumpyNear) {
 				if (agl.x === treasure.x)
 					moveX = false;
 				else if (agl.y === treasure.y)
@@ -108,40 +105,52 @@ export const App = () => {
 
 			x = moveX ? Math.round(Math.random() * 2 - 1) : 0;
 			y = moveX ? 0 : Math.round(Math.random() * 2 - 1);
-			
-			console.log("Agente", x, y);
+
+			console.log(cycles, "- Agente", x, y, `[${agl.x},${agl.y}] =>[${agl.x + x},${agl.y + y}], Turn: ${turn}`);
 			cycles++;
+			console.log(
+				// Expresión para evitar que el agente se mantenga quieto y se salga del tablero
+				(x == 0 && y == 0) || (x + agl.x) < 0 || (y + agl.y) < 0 || (x + agl.x) > 4 || (y + agl.y) > 4,
+				// Expresión para evitar que el agente entre a los pozos
+				(x + agl.x === well.x && y + agl.y === well.y) || (x + agl.x === secondWell.x && y + agl.y === secondWell.y),
+				// Expresión para evitar que el agente se acerque a Gumpy, para que se aleje
+				(isGumpyNear && (agl.x < gumpy.x && x > 0 || agl.x > gumpy.x && x < 0 || agl.y < gumpy.y && y > 0 || agl.y > gumpy.y && y < 0) && turn % 2 == 0),
+				// Expresión para evitar que el agente se aleje del tesoro si gumpy no está cerca
+				(isTreasureNear && !isGumpyNear && (agl.x < treasure.x && x < 0 || agl.x > treasure.x && x > 0 || agl.y < treasure.y && y < 0 || agl.y > treasure.y && y > 0) && !isWellNear && !isSecondWellNear)
+			);
 		} while (
 			// Expresión para evitar que el agente se mantenga quieto y se salga del tablero
 			(x == 0 && y == 0) || (x + agl.x) < 0 || (y + agl.y) < 0 || (x + agl.x) > 4 || (y + agl.y) > 4 ||
 			// Expresión para evitar que el agente entre a los pozos
 			(x + agl.x === well.x && y + agl.y === well.y) || (x + agl.x === secondWell.x && y + agl.y === secondWell.y) ||
 			// Expresión para evitar que el agente se acerque a Gumpy, para que se aleje
-			(isGumpyNear && (agl.x < gumpy.x && x > 0 || agl.x > gumpy.x && x < 0 || agl.y < gumpy.y && y > 0 || agl.y > gumpy.y && y < 0)) ||
+			(isGumpyNear && (agl.x < gumpy.x && x > 0 || agl.x > gumpy.x && x < 0 || agl.y < gumpy.y && y > 0 || agl.y > gumpy.y && y < 0) && turn % 2 == 0) ||
 			// Expresión para evitar que el agente se aleje del tesoro si gumpy no está cerca
 			(isTreasureNear && !isGumpyNear && (agl.x < treasure.x && x < 0 || agl.x > treasure.x && x > 0 || agl.y < treasure.y && y < 0 || agl.y > treasure.y && y > 0) && !isWellNear && !isSecondWellNear)
 		);
 
 		if (agl.x + x === treasure.x && agl.y + y === treasure.y) {
 			score += 1000;
-			setPause(true);
 			addLog("¡El agente encontró el tesoro!", { color: "#00AA00", fontWeight: "bold" });
+			endGame();
 		}
 		if (agl.x + x === well.x && agl.y + y === well.y ||
 			agl.x + x === secondWell.x && agl.y + y === secondWell.y) {
 			score -= 1000;
 			addLog("Caiste en un pozo", { fontWeight: "bold" });
+			endGame();
 		}
 		if (agl.x + x === gumpy.x && agl.y + y === gumpy.y) {
 			score -= 1000;
 			addLog("Te comió Gumpy", { color: "#FF0000", fontWeight: "bold" });
+			endGame();
 		}
 
-		setAgl(agl => ({
+		agl = {
 			x: agl.x + x,
 			y: agl.y + y,
 			score
-		}));
+		};
 
 		setTurn(turn => turn + 1);
 	}
@@ -169,41 +178,57 @@ export const App = () => {
 		let cycles = 0;
 		do {
 			if (cycles > tolerance) {
-				setPause(true);
 				addLog("Gumpy no puede moverse", { color: "#FF0000", fontWeight: "bold" });
-				return;
+				return endGame();
 			}
 
 			let moveX = Math.random() > 0.5;
 			x = moveX ? Math.round(Math.random() * 2 - 1) : 0;
 			y = moveX ? 0 : Math.round(Math.random() * 2 - 1);
-			console.log("Gumpy", x, y);
+			console.log(cycles, "- Gumpy", x, y, `[${gumpy.x + x},${gumpy.y + y}], Turn: ${turn}`);
 			cycles++;
+
+			console.log(
+				// Expresión para evitar que Gumpy se mantenga quieto y se salga del tablero
+				(x == 0 && y == 0) || (x + gumpy.x) < 0 || (y + gumpy.y) < 0 || (x + gumpy.x) > 4 || (y + gumpy.y) > 4,
+				// Expresión para evitar que Gumpy entre a los pozos
+				(x + gumpy.x === well.x && y + gumpy.y === well.y) || (x + gumpy.x === secondWell.x && y + gumpy.y === secondWell.y),
+				// Expresión para que Gumpy se acerque al agente
+				(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0)),
+				//Expresión para que Gumpy evite el tesoro
+				(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y)
+			);
+
 		} while (
 			// Expresión para evitar que Gumpy se mantenga quieto y se salga del tablero
 			(x == 0 && y == 0) || (x + gumpy.x) < 0 || (y + gumpy.y) < 0 || (x + gumpy.x) > 4 || (y + gumpy.y) > 4 ||
 			// Expresión para evitar que Gumpy entre a los pozos
-			(x + gumpy.x === well.x && y + gumpy.y === well.y) || (x + gumpy.x === secondWell.x && y + gumpy.y === secondWell.y) || (x + gumpy.x === agl.x && y + gumpy.y === agl.y) ||
+			(x + gumpy.x === well.x && y + gumpy.y === well.y) || (x + gumpy.x === secondWell.x && y + gumpy.y === secondWell.y) ||
 			// Expresión para que Gumpy se acerque al agente
 			(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0)) ||
 			//Expresión para que Gumpy evite el tesoro
 			(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y)
 		);
 
-		setGumpy(gumpy => ({
-			x: gumpy.x + x,
-			y: gumpy.y + y
-		}));
+		if (!pause)
+			gumpy = {
+				x: gumpy.x + x,
+				y: gumpy.y + y
+			};
+	}
+
+	const endGame = () => {
+		addLog("Fin del juego", { color: "#FF0000", fontWeight: "bold" });
+		clearTimeout(timer);
+		setPause(true);
 	}
 
 	const restart = () => {
 		logs = [];
 		timer = null;
-		setAgl({ x: 0, y: 0, score: 0 });
-		setTurn(0);
+		agl = { x: 0, y: 0, score: 0 };
 		setPause(false);
 
-		let treasure, well, secondWell, gumpy;
 		do {
 			well = initializeLocation()
 			secondWell = initializeLocation()
@@ -217,22 +242,16 @@ export const App = () => {
 			gumpy.x === well.x && gumpy.y === well.y ||
 			gumpy.x === secondWell.x && gumpy.y === secondWell.y
 		);
-
-		setTreasure(treasure)
-		setWell(well)
-		setSecondWell(secondWell)
-		setGumpy(gumpy)
+		console.log("well", well, "secondWell", secondWell, "gumpy", gumpy, "treasure", treasure);
+		setTurn(1);
 	}
 
 	const siguiente = () => {
-		setAgl(prevState => ({
-			...prevState,
-			x: 0,
-			y: 0,
-		}));
+		agl.x = 0;
+		agl.y = 0;
+
 		setPause(false);
 
-		let treasure, well, secondWell, gumpy;
 		do {
 			well = initializeLocation()
 			secondWell = initializeLocation()
@@ -246,11 +265,6 @@ export const App = () => {
 			gumpy.x === well.x && gumpy.y === well.y ||
 			gumpy.x === secondWell.x && gumpy.y === secondWell.y
 		);
-
-		setTreasure(treasure)
-		setWell(well)
-		setSecondWell(secondWell)
-		setGumpy(gumpy)
 	}
 
 	return (
@@ -268,14 +282,14 @@ export const App = () => {
 										}}
 									>
 										<div className="flex justify-center items-center w-full">
-											<p class="text-center">
+											<p className="text-center">
 												{agl.x === x && agl.y === y ? "🤖" : ""}
 												{treasure.x === x && treasure.y === y ? "🎁" : ""}
 												{well.x === x && well.y === y ? "🌀" : ""}
 												{secondWell.x === x && secondWell.y === y ? "🌀" : ""}
 												{gumpy.x === x && gumpy.y === y ? "👹" : ""}
 											</p>
-											<button className="" onClick={() => setAgl({ x, y })}></button>
+											<button className="" onClick={() => agl = { ...agl, x, y }}></button>
 										</div>
 									</div>
 								)
