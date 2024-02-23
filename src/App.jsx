@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import base64image from "./assets/chicharron";
 
 const initializeLocation = () => {
 	let x, y;
@@ -287,7 +288,11 @@ export const App = () => {
 												{treasure.x === x && treasure.y === y ? "🎁" : ""}
 												{well.x === x && well.y === y ? "🌀" : ""}
 												{secondWell.x === x && secondWell.y === y ? "🌀" : ""}
-												{gumpy.x === x && gumpy.y === y ? "👹" : ""}
+												{gumpy.x === x && gumpy.y === y ?
+													<div className="flex justify-center items-center">
+														<img src={base64image} className="w-1/2" alt="Gumpy Image" />
+													</div>
+													: ""}
 											</p>
 											<button className="" onClick={() => agl = { ...agl, x, y }}></button>
 										</div>
