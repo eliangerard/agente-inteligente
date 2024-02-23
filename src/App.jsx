@@ -25,7 +25,6 @@ let agl = {
 	score: 0,
 };
 
-let cont2 = 0;
 export const App = () => {
 	const tolerance = 100;
 	const divLogs = useRef(null);
@@ -37,8 +36,6 @@ export const App = () => {
 	const [gameSpeed, setGameSpeed] = useState(1000);
 	const [pause, setPause] = useState(false);
 
-
-	const [cont, setCont] = useState(0);
 
 
 	// useEffect es un hook que se ejecuta después de cada renderizado, es decir, después de cada vez que el componente se actualiza.
@@ -206,7 +203,7 @@ export const App = () => {
 			// Expresión para evitar que Gumpy entre a los pozos
 			(x + gumpy.x === well.x && y + gumpy.y === well.y) || (x + gumpy.x === secondWell.x && y + gumpy.y === secondWell.y) ||
 			// Expresión para que Gumpy se acerque al agente
-			(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0)) ||
+			(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0) && !isWellNear && !isSecondWellNear && !isTreasureNear) ||
 			//Expresión para que Gumpy evite el tesoro
 			(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y)
 		);
