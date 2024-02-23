@@ -124,7 +124,9 @@ export const App = () => {
 			// Expresión para evitar que el agente se acerque a Gumpy, para que se aleje
 			(isGumpyNear && (agl.x < gumpy.x && x > 0 || agl.x > gumpy.x && x < 0 || agl.y < gumpy.y && y > 0 || agl.y > gumpy.y && y < 0) && turn % 2 == 0) ||
 			// Expresión para evitar que el agente se aleje del tesoro si gumpy no está cerca
-			(isTreasureNear && !isGumpyNear && (agl.x < treasure.x && x < 0 || agl.x > treasure.x && x > 0 || agl.y < treasure.y && y < 0 || agl.y > treasure.y && y > 0) && !isWellNear && !isSecondWellNear)
+			(isTreasureNear && !isGumpyNear && (agl.x < treasure.x && x < 0 || agl.x > treasure.x && x > 0 || agl.y < treasure.y && y < 0 || agl.y > treasure.y && y > 0) && (
+				isWellNear && (well.x == x + agl.x && well.y == y + agl.y) || isSecondWellNear && (secondWell.x == x + agl.x && secondWell.y == y + agl.y)
+			))
 		);
 
 		if (agl.x + x === treasure.x && agl.y + y === treasure.y) {
@@ -192,7 +194,9 @@ export const App = () => {
 				// Expresión para evitar que Gumpy entre a los pozos
 				(x + gumpy.x === well.x && y + gumpy.y === well.y) || (x + gumpy.x === secondWell.x && y + gumpy.y === secondWell.y),
 				// Expresión para que Gumpy se acerque al agente
-				(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0)),
+				(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0) && (
+					isWellNear && (well.x == x + gumpy.x && well.y == y + gumpy.y) || isSecondWellNear && (secondWell.x == x + gumpy.x && secondWell.y == y + gumpy.y)
+				)),
 				//Expresión para que Gumpy evite el tesoro
 				(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y)
 			);
@@ -273,11 +277,12 @@ export const App = () => {
 						[...Array(5)].map((_, y) => {
 							const rows = [...Array(5)].map((_, x) => {
 								return (
-									<div key={`${x}:${y}`} className="border-2 border-black w-28 h-28 text-4xl flex justify-between align-middle"
+									<div key={`${x}:${y}`} className="border-2 border-black w-28 h-28 text-4xl flex justify-between align-middle hover:cursor-pointer"
 										style={{
 											backgroundColor: ((x == agl.x || x == agl.x + 1 || x == agl.x - 1) && (y == agl.y || y == agl.y - 1 || y == agl.y + 1)) ? "#369c36" : (
 												((x == gumpy.x || x == gumpy.x + 1 || x == gumpy.x - 1) && (y == gumpy.y || y == gumpy.y - 1 || y == gumpy.y + 1)) ? "#5d369c" : "white")
 										}}
+										onClick={() => agl = { ...agl, x, y }}
 									>
 										<div className="flex justify-center items-center w-full">
 											<p className="text-center">
@@ -291,7 +296,7 @@ export const App = () => {
 													</div>
 													: ""}
 											</p>
-											<button className="" onClick={() => agl = { ...agl, x, y }}></button>
+											<button ></button>
 										</div>
 									</div>
 								)
