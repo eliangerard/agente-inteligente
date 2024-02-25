@@ -254,14 +254,14 @@ export const App = () => {
 	}
 
 	return (
-		<div className="w-screen h-screen flex flex-col">
-			<div className="flex overflow-hidden">
-				<div className="flex flex-col justify-center items-center w-1/2 p-20">
+		<div className="flex flex-col min-h-screen max-h-screen min-w-screen max-w-screen">
+			<div className="flex flex-col md:flex-row flex-grow overflow-hidden">
+				<div className="flex flex-col justify-center items-center w-full md:w-1/2 p-20">
 					{
 						[...Array(5)].map((_, y) => {
 							const rows = [...Array(5)].map((_, x) => {
 								return (
-									<div key={`${x}:${y}`} className="border-2 border-black w-28 h-28 text-4xl flex justify-between align-middle hover:cursor-pointer"
+									<div key={`${x}:${y}`} className="border-2 border-black w-28 h-28 text-3xl flex justify-center items-center hover:cursor-pointer"
 										style={{
 											backgroundColor: ((x == agl.x || x == agl.x + 1 || x == agl.x - 1) && (y == agl.y || y == agl.y - 1 || y == agl.y + 1)) ? "#369c36" : (
 												((x == gumpy.x || x == gumpy.x + 1 || x == gumpy.x - 1) && (y == gumpy.y || y == gumpy.y - 1 || y == gumpy.y + 1)) ? "#5d369c" : "white")
@@ -288,7 +288,7 @@ export const App = () => {
 						})
 					}
 				</div>
-				<div className="w-1/2 flex flex-col p-20">
+				<div className="w-full md:w-1/2 flex flex-col p-20">
 					<div className="flex flex-col p-4 bg-gray-200">
 						<div className="mb-4">
 							<p className="font-bold text-lg text-blue-600">Turno: {turn}</p>
@@ -313,8 +313,8 @@ export const App = () => {
 						<button onClick={siguiente} className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700 transition duration-300">Siguiente</button>
 					</div>
 					<h2 className="p-4">Mensajes</h2>
-					<div className="flex-1 overflow-y-auto">
-						<div ref={divLogs} className="w-full flex flex-col-reverse bg-zinc-200">
+					<div className="overflow-y-auto">
+						<div ref={divLogs} className="w-full flex flex-col-reverse bg-zinc-200 overflow-y-auto">
 							{
 								logs.map((message, i) => <p className="italic" style={message.style} key={i}>{message.content}</p>)
 							}
