@@ -32,7 +32,7 @@ export const App = () => {
 	const [gameSpeed, setGameSpeed] = useState(1000);
 	const [pause, setPause] = useState(false);
 
-	const [zoom, setZoom] = useState(1);
+	const [zoom, setZoom] = useState(0.8);
 
 	useEffect(() => {
 		restart();
@@ -258,14 +258,14 @@ export const App = () => {
 	return (
 		<>
 			<div className="flex flex-col h-screen w-full md:flex-row bg-zinc-200">
-				<div className="flex flex-col w-full md:w-1/2 h-1/2 md:h-full p-4 pb-0 md:pb-6">
-					<h2 className="px-4 py-2 font-bold text-xl text-center">Agente Inteligente</h2>
-					<div className="w-full h-full bg-white rounded-xl flex items-center relative overflow-hidden">
-						<div className="absolute right-2 top-2 rounded-xl border-4 border-gray-300 flex flex-col overflow-hidden">
-							<button onClick={() => setZoom(zoom => zoom + 0.2)} className="w-8 h-8 font-semibold border-b-2 bg-white">+</button>
-							<button onClick={() => setZoom(zoom => zoom >= 1 ? zoom - 0.2 : zoom)} className="w-8 h-8 font-semibold bg-white">-</button>
-						</div>
-						<div className="flex flex-col max-h-1/2 items-center w-full md:h-full md:justify-center">
+				<div className="flex flex-col w-full md:w-1/2 h-1/2 md:h-full p-4 pt-2 md:pt-4 pb-0 md:pb-6 relative">
+					<h2 className="px-4 pb-2 md:py-2 font-bold text-xl text-center">Agente Inteligente</h2>
+					<div className="absolute right-8 top-20 rounded-xl border-4 border-gray-300 flex flex-col overflow-hidden">
+						<button onClick={() => setZoom(zoom => zoom + 0.2)} className="w-8 h-8 font-semibold border-b-2 bg-white">+</button>
+						<button onClick={() => setZoom(zoom => zoom >= 1 ? zoom - 0.2 : zoom)} className="w-8 h-8 font-semibold bg-white">-</button>
+					</div>
+					<div className="w-full h-full bg-white rounded-xl flex items-center overflow-auto">
+						<div className="flex flex-col max-h-1/2 items-center w-full md:h-full md:justify-center select-none">
 							{
 								[...Array(5)].map((_, y) => {
 									const rows = [...Array(5)].map((_, x) => {
@@ -279,7 +279,11 @@ export const App = () => {
 													width: `${zoom * 5}rem`,
 													height: `${zoom * 5}rem`
 												}}
-												onClick={() => agl = { ...agl, x, y }}
+												onClick={() => {
+													agl = { ...agl, x, y };
+													clearTimeout(timer);
+													setTurn(turn => turn + 1)
+												}}
 											>
 												<div className="flex justify-center items-center w-full">
 													<p className="text-center"
