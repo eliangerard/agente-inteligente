@@ -305,7 +305,7 @@ export const App = () => {
 						</div>
 					</div>
 				</div>
-				<div className="flex flex-col h-1/2 md:flex-grow w-full px-4 md:flex-1 md:pr-4 md:py-4 md:h-full">
+				<div className="flex flex-col h-1/2 md:flex-grow w-full px-4 md:flex-1 md:pr-4 md:pl-0 md:py-4 md:h-full">
 					<h2 className="px-4 hidden md:block py-2 font-bold text-xl">Controles</h2>
 					<div className="flex flex-col p-4 mt-2 md:mt-0 rounded-xl bg-white">
 						<div className="mb-4 flex justify-between">
