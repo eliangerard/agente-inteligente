@@ -32,6 +32,8 @@ export const App = () => {
 	const [gameSpeed, setGameSpeed] = useState(1000);
 	const [pause, setPause] = useState(false);
 
+	const [zoom, setZoom] = useState(1);
+
 	useEffect(() => {
 		restart();
 	}, [])
@@ -211,7 +213,7 @@ export const App = () => {
 
 	const restart = () => {
 		logs = [];
-		timer = null;
+		clearTimeout(timer);
 		agl = { x: 0, y: 0, score: 0 };
 		setPause(false);
 
@@ -254,48 +256,64 @@ export const App = () => {
 	}
 
 	return (
-		<div className="flex flex-col min-h-screen max-h-screen min-w-screen max-w-screen">
-			<div className="flex flex-col md:flex-row flex-grow overflow-hidden">
-				<div className="flex flex-col justify-center items-center w-full md:w-1/2 p-20">
-					{
-						[...Array(5)].map((_, y) => {
-							const rows = [...Array(5)].map((_, x) => {
-								return (
-									<div key={`${x}:${y}`} className="border-2 border-black w-28 h-28 text-3xl flex justify-center items-center hover:cursor-pointer"
-										style={{
-											backgroundColor: ((x == agl.x || x == agl.x + 1 || x == agl.x - 1) && (y == agl.y || y == agl.y - 1 || y == agl.y + 1)) ? "#369c36" : (
-												((x == gumpy.x || x == gumpy.x + 1 || x == gumpy.x - 1) && (y == gumpy.y || y == gumpy.y - 1 || y == gumpy.y + 1)) ? "#5d369c" : "white")
-										}}
-										onClick={() => agl = { ...agl, x, y }}
-									>
-										<div className="flex justify-center items-center w-full">
-											<p className="text-center">
-												{agl.x === x && agl.y === y ? "🤖" : ""}
-												{treasure.x === x && treasure.y === y ? "🎁" : ""}
-												{well.x === x && well.y === y ? "🌀" : ""}
-												{secondWell.x === x && secondWell.y === y ? "🌀" : ""}
-												{gumpy.x === x && gumpy.y === y ? "👹": ""}
-											</p>
+		<>
+			<div className="flex flex-col h-screen w-full md:flex-row bg-zinc-200">
+				<div className="flex flex-col w-full md:w-1/2 h-1/2 md:h-full p-4 pb-0 md:pb-6">
+					<h2 className="px-4 py-2 font-bold text-xl text-center">Agente Inteligente</h2>
+					<div className="w-full h-full bg-white rounded-xl flex items-center relative overflow-hidden">
+						<div className="absolute right-2 top-2 rounded-xl border-4 border-gray-300 flex flex-col overflow-hidden">
+							<button onClick={() => setZoom(zoom => zoom + 0.2)} className="w-8 h-8 font-semibold border-b-2 bg-white">+</button>
+							<button onClick={() => setZoom(zoom => zoom >= 1 ? zoom - 0.2 : zoom)} className="w-8 h-8 font-semibold bg-white">-</button>
+						</div>
+						<div className="flex flex-col max-h-1/2 items-center w-full md:h-full md:justify-center">
+							{
+								[...Array(5)].map((_, y) => {
+									const rows = [...Array(5)].map((_, x) => {
+										return (
+											<div key={`${x}:${y}`} className={`border-2 border-gray-300 min-w-16 min-h-16 text-3xl flex justify-center items-center hover:cursor-pointer ${x === 0 && y === 0 ? 'rounded-tl-xl' : ''} ${x === 4 && y === 0 ? 'rounded-tr-xl' : ''} ${x === 0 && y === 4 ? 'rounded-bl-xl' : ''} ${x === 4 && y === 4 ? 'rounded-br-xl' : ''} ${x === 0 ? 'border-l-4' : ''} ${y === 0 ? 'border-t-4' : ''} ${x === 4 ? 'border-r-4' : ''} ${y === 4 ? 'border-b-4' : ''}`}
+												style={{
+													backgroundColor:
+														((x == agl.x || x == agl.x + 1 || x == agl.x - 1) && (y == agl.y || y == agl.y - 1 || y == agl.y + 1)) && ((x == gumpy.x || x == gumpy.x + 1 || x == gumpy.x - 1) && (y == gumpy.y || y == gumpy.y - 1 || y == gumpy.y + 1)) ? "#ff0000aa" :
+															((x == agl.x || x == agl.x + 1 || x == agl.x - 1) && (y == agl.y || y == agl.y - 1 || y == agl.y + 1)) ? "#369c3688" : (
+																((x == gumpy.x || x == gumpy.x + 1 || x == gumpy.x - 1) && (y == gumpy.y || y == gumpy.y - 1 || y == gumpy.y + 1)) ? "#5d369c88" : "white"),
+													width: `${zoom * 5}rem`,
+													height: `${zoom * 5}rem`
+												}}
+												onClick={() => agl = { ...agl, x, y }}
+											>
+												<div className="flex justify-center items-center w-full">
+													<p className="text-center"
+														style={{ fontSize: `${zoom * 1.2}rem` }}
+													>
+														{agl.x === x && agl.y === y ? "🤖" : ""}
+														{treasure.x === x && treasure.y === y ? "🎁" : ""}
+														{well.x === x && well.y === y ? "🌀" : ""}
+														{secondWell.x === x && secondWell.y === y ? "🌀" : ""}
+														{gumpy.x === x && gumpy.y === y ? "👹" : ""}
+													</p>
+												</div>
+											</div>
+										)
+									})
+									return (
+										<div key={`${y}`} className="flex w-fit">
+											{rows}
 										</div>
-									</div>
-								)
-							})
-							return (
-								<div key={`${y}`} className="flex w-fit">
-									{rows}
-								</div>
-							);
-						})
-					}
+									);
+								})
+							}
+						</div>
+					</div>
 				</div>
-				<div className="w-full md:w-1/2 flex flex-col p-20">
-					<div className="flex flex-col p-4 bg-gray-200">
-						<div className="mb-4">
+				<div className="flex flex-col h-1/2 md:flex-grow w-full px-4 md:flex-1 md:pr-4 md:py-4 md:h-full">
+					<h2 className="px-4 hidden md:block py-2 font-bold text-xl">Controles</h2>
+					<div className="flex flex-col p-4 mt-2 md:mt-0 rounded-xl bg-white">
+						<div className="mb-4 flex justify-between">
 							<p className="font-bold text-lg text-blue-600">Turno: {turn}</p>
 							<p className="font-bold text-lg text-green-600">Puntaje: {agl.score}</p>
 						</div>
-						<div className="mb-4">
-							<label className="font-bold text-orange-500 block mb-2">Velocidad:</label>
+						<div className="mb-2">
+							<label className="font-bold text-orange-500 block mb-2">Velocidad: {gameSpeed} ms</label>
 							<input
 								className="w-full border-2 border-black"
 								type="range"
@@ -304,25 +322,24 @@ export const App = () => {
 								value={gameSpeed}
 								onChange={(e) => setGameSpeed(e.target.value)}
 							/>
-							<p className="text-center font-bold">{gameSpeed}</p>
+						</div>
+						<div className="flex justify-around px-4">
+							<button onClick={() => setPause(!pause)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-300">{pause ? "Reanudar" : "Pausar"}</button>
+							<button onClick={restart} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 transition duration-300">Reiniciar</button>
+							<button onClick={siguiente} className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700 transition duration-300">Siguiente</button>
 						</div>
 					</div>
-					<div className="flex justify-around p-4">
-						<button onClick={() => setPause(!pause)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-300">{pause ? "Reanudar" : "Pausar"}</button>
-						<button onClick={restart} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 transition duration-300">Reiniciar</button>
-						<button onClick={siguiente} className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700 transition duration-300">Siguiente</button>
-					</div>
-					<h2 className="p-4">Mensajes</h2>
-					<div className="overflow-y-auto">
-						<div ref={divLogs} className="w-full flex flex-col-reverse bg-zinc-200 overflow-y-auto">
+					<h2 className="px-4 hidden md:block py-2 font-bold text-xl">Mensajes</h2>
+					<div className="w-full my-2 md:mt-0 flex flex-col flex-grow overflow-y-scroll rounded-xl bg-white p-4">
+						<div ref={divLogs} className="w-full h-fit flex flex-col-reverse">
 							{
-								logs.map((message, i) => <p className="italic" style={message.style} key={i}>{message.content}</p>)
+								logs.map((message, i) => <p className={`italic border-b-2 border-zinc-200`} style={message.style} key={i}>{message.content}</p>)
 							}
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	)
 }
 
