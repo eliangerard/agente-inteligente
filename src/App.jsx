@@ -46,6 +46,7 @@ export const App = () => {
 				if (turn % 2 == 0)
 					moveGumpy();
 				moveAgl();
+				setTurn(turn => turn + 1);
 			}, gameSpeed);
 	}, [turn, pause]);
 
@@ -53,7 +54,7 @@ export const App = () => {
 		const date = new Date();
 		logs.unshift({ content: date.toLocaleString() + " - " + log, style });
 	}
-
+	//Función para mover el Agente Inteligente
 	const moveAgl = () => {
 		let x, y, score = agl.score - 1;
 		let cycles = 0;
@@ -82,7 +83,23 @@ export const App = () => {
 			}
 
 			let moveX;
-			let safeMoveToTreasure = isTreasureNear && !(well.x === treasure.x && well.y === treasure.y) && !(secondWell.x === treasure.x && secondWell.y === treasure.y);
+			let safeMoveToTreasure = isTreasureNear && !(
+				(agl.x === treasure.x - 1 && agl.y === treasure.y - 1) && (well.x === treasure.x - 1 && well.y === treasure.y) && (secondWell.x === treasure.x && secondWell.y === treasure.y - 1) || // Esquina superior izquierda
+				(agl.x === treasure.x + 1 && agl.y === treasure.y - 1) && (well.x === treasure.x && well.y === treasure.y - 1) && (secondWell.x === treasure.x + 1 && secondWell.y === treasure.y) || // Esquina superior derecha
+				(agl.x === treasure.x - 1 && agl.y === treasure.y + 1) && (well.x === treasure.x - 1 && well.y === treasure.y) && (secondWell.x === treasure.x && secondWell.y === treasure.y + 1) || // Esquina inferior izquierda
+				(agl.x === treasure.x + 1 && agl.y === treasure.y + 1) && (well.x === treasure.x && well.y === treasure.y + 1) && (secondWell.x === treasure.x + 1 && secondWell.y === treasure.y) || // Esquina inferior derecha
+				(agl.x === treasure.x - 1 && agl.y === treasure.y - 1) && (secondWell.x === treasure.x - 1 && secondWell.y === treasure.y) && (well.x === treasure.x && well.y === treasure.y - 1) || // Esquina superior izquierda
+				(agl.x === treasure.x + 1 && agl.y === treasure.y - 1) && (secondWell.x === treasure.x && secondWell.y === treasure.y - 1) && (well.x === treasure.x + 1 && well.y === treasure.y) || // Esquina superior derecha
+				(agl.x === treasure.x - 1 && agl.y === treasure.y + 1) && (secondWell.x === treasure.x - 1 && secondWell.y === treasure.y) && (well.x === treasure.x && well.y === treasure.y + 1) || // Esquina inferior izquierda
+				(agl.x === treasure.x + 1 && agl.y === treasure.y + 1) && (secondWell.x === treasure.x && secondWell.y === treasure.y + 1) && (well.x === treasure.x + 1 && well.y === treasure.y) // Esquina inferior derecha				
+			);
+
+			console.log("Safe",
+				(agl.x === treasure.x - 1 && agl.y === treasure.y - 1) && (well.x === treasure.x - 1 && well.y === treasure.y) && (secondWell.x === treasure.x && secondWell.y === treasure.y - 1),
+				(agl.x === treasure.x + 1 && agl.y === treasure.y - 1) && (well.x === treasure.x && well.y === treasure.y - 1) && (secondWell.x === treasure.x + 1 && secondWell.y === treasure.y),
+				(agl.x === treasure.x - 1 && agl.y === treasure.y + 1) && (well.x === treasure.x - 1 && well.y === treasure.y) && (secondWell.x === treasure.x && secondWell.y === treasure.y + 1),
+				(agl.x === treasure.x + 1 && agl.y === treasure.y + 1) && (well.x === treasure.x && well.y === treasure.y + 1) && (secondWell.x === treasure.x + 1 && secondWell.y === treasure.y)
+			);
 
 			if (safeMoveToTreasure && !isGumpyNear) {
 				let deltaX = Math.abs(agl.x - treasure.x);
@@ -138,8 +155,6 @@ export const App = () => {
 			y: agl.y + y,
 			score
 		};
-
-		setTurn(turn => turn + 1);
 	}
 
 	const moveGumpy = () => {
@@ -163,6 +178,18 @@ export const App = () => {
 			addLog("Gumpy ha detectado el tesoro en: " + treasure.x + ":" + treasure.y, { color: "#5d369c" });
 
 		let cycles = 0;
+
+		let isSafeToMoveToAgl = isAglNear && !(
+			(gumpy.x === agl.x - 1 && gumpy.y === agl.y - 1) && (well.x === agl.x - 1 && well.y === agl.y) && (secondWell.x === agl.x && secondWell.y === agl.y - 1) || // Esquina superior izquierda
+			(gumpy.x === agl.x + 1 && gumpy.y === agl.y - 1) && (well.x === agl.x && well.y === agl.y - 1) && (secondWell.x === agl.x + 1 && secondWell.y === agl.y) || // Esquina superior derecha
+			(gumpy.x === agl.x - 1 && gumpy.y === agl.y + 1) && (well.x === agl.x - 1 && well.y === agl.y) && (secondWell.x === agl.x && secondWell.y === agl.y + 1) || // Esquina inferior izquierda
+			(gumpy.x === agl.x + 1 && gumpy.y === agl.y + 1) && (well.x === agl.x && well.y === agl.y + 1) && (secondWell.x === agl.x + 1 && secondWell.y === agl.y) || // Esquina inferior derecha
+			(gumpy.x === agl.x - 1 && gumpy.y === agl.y - 1) && (secondWell.x === agl.x - 1 && secondWell.y === agl.y) && (well.x === agl.x && well.y === agl.y - 1) || // Esquina superior izquierda
+			(gumpy.x === agl.x + 1 && gumpy.y === agl.y - 1) && (secondWell.x === agl.x && secondWell.y === agl.y - 1) && (well.x === agl.x + 1 && well.y === agl.y) || // Esquina superior derecha
+			(gumpy.x === agl.x - 1 && gumpy.y === agl.y + 1) && (secondWell.x === agl.x - 1 && secondWell.y === agl.y) && (well.x === agl.x && well.y === agl.y + 1) || // Esquina inferior izquierda
+			(gumpy.x === agl.x + 1 && gumpy.y === agl.y + 1) && (secondWell.x === agl.x && secondWell.y === agl.y + 1) && (well.x === agl.x + 1 && well.y === agl.y) // Esquina inferior derecha
+		);
+
 		do {
 			if (cycles > tolerance) {
 				addLog("Gumpy no puede moverse", { color: "#FF0000", fontWeight: "bold" });
@@ -174,20 +201,6 @@ export const App = () => {
 			y = moveX ? 0 : Math.round(Math.random() * 2 - 1);
 			console.log(cycles, "- Gumpy", x, y, `[${gumpy.x + x},${gumpy.y + y}], Turn: ${turn}`);
 			cycles++;
-
-			console.log(
-				// Expresión para evitar que Gumpy se mantenga quieto y se salga del tablero
-				(x == 0 && y == 0) || (x + gumpy.x) < 0 || (y + gumpy.y) < 0 || (x + gumpy.x) > 4 || (y + gumpy.y) > 4,
-				// Expresión para evitar que Gumpy entre a los pozos
-				(x + gumpy.x === well.x && y + gumpy.y === well.y) || (x + gumpy.x === secondWell.x && y + gumpy.y === secondWell.y),
-				// Expresión para que Gumpy se acerque al agente
-				(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0) && (
-					isWellNear && (well.x == x + gumpy.x && well.y == y + gumpy.y) || isSecondWellNear && (secondWell.x == x + gumpy.x && secondWell.y == y + gumpy.y)
-				)),
-				//Expresión para que Gumpy evite el tesoro
-				(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y)
-			);
-
 		} while (
 			// Expresión para evitar que Gumpy se mantenga quieto y se salga del tablero
 			(x == 0 && y == 0) || (x + gumpy.x) < 0 || (y + gumpy.y) < 0 || (x + gumpy.x) > 4 || (y + gumpy.y) > 4 ||
@@ -195,7 +208,9 @@ export const App = () => {
 			(x + gumpy.x === well.x && y + gumpy.y === well.y) || (x + gumpy.x === secondWell.x && y + gumpy.y === secondWell.y) ||
 			(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0) && !isWellNear && !isSecondWellNear && !isTreasureNear) ||
 			//Expresión para que Gumpy evite el tesoro
-			(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y)
+			(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y) || 
+			//Expresión para que Gumpy evite los pozos si va a ir hacia el agente
+			(isAglNear && isSafeToMoveToAgl)
 		);
 
 		if (!pause)
@@ -280,7 +295,7 @@ export const App = () => {
 													height: `${zoom * 5}rem`
 												}}
 												onClick={() => {
-													agl = { ...agl, x, y };
+													gumpy = { ...gumpy, x, y };
 													clearTimeout(timer);
 													setTurn(turn => turn + 1)
 												}}
