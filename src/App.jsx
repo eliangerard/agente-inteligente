@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react"
-import base64image from "./assets/chicharron";
 
 const initializeLocation = () => {
 	let x, y;
@@ -64,6 +63,7 @@ export const App = () => {
 
 	const moveAgl = () => {
 		let x, y, score = agl.score - 1;
+		let cycles = 0;
 
 		let isGumpyNear = (gumpy.x === agl.x || gumpy.x === agl.x + 1 || gumpy.x === agl.x - 1) && (gumpy.y === agl.y || gumpy.y === agl.y - 1 || gumpy.y === agl.y + 1);
 		let isWellNear = (well.x === agl.x || well.x === agl.x + 1 || well.x === agl.x - 1) && (well.y === agl.y || well.y === agl.y - 1 || well.y === agl.y + 1);
@@ -82,51 +82,52 @@ export const App = () => {
 		if (isTreasureNear)
 			addLog("El agente ha detectado el tesoro en: " + treasure.x + ":" + treasure.y, { color: "#369c36" });
 
-		let cycles = 0;
-
 		do {
 			if (cycles > tolerance) {
 				addLog("El agente no puede moverse", { color: "#FF0000", fontWeight: "bold" });
 				return endGame();
 			}
+
 			let moveX;
+			// Determina si el movimiento hacia el tesoro es seguro (no adyacente a un pozo)
+			let safeMoveToTreasure = isTreasureNear && !(well.x === treasure.x && well.y === treasure.y) && !(secondWell.x === treasure.x && secondWell.y === treasure.y);
 
-			// Expresión para que si el agente detecta el tesoro se mueva hacia él
-			if (isTreasureNear && !isWellNear && !isSecondWellNear && !isGumpyNear) {
-				if (agl.x === treasure.x)
-					moveX = false;
-				else if (agl.y === treasure.y)
-					moveX = true;
-			}
-			else
+			if (safeMoveToTreasure && !isGumpyNear) {
+				// Determina la dirección del movimiento basado en la distancia más corta al tesoro
+				let deltaX = Math.abs(agl.x - treasure.x);
+				let deltaY = Math.abs(agl.y - treasure.y);
+
+				if (deltaX > deltaY) {
+					// Moverse en el eje X
+					x = agl.x < treasure.x ? 1 : -1;
+					y = 0;
+				} else if (deltaY > deltaX) {
+					// Moverse en el eje Y
+					x = 0;
+					y = agl.y < treasure.y ? 1 : -1;
+				} else {
+					// Si las distancias son iguales, elige un eje al azar para moverse
+					if (Math.random() > 0.5) {
+						x = agl.x < treasure.x ? 1 : -1;
+						y = 0;
+					} else {
+						x = 0;
+						y = agl.y < treasure.y ? 1 : -1;
+					}
+				}
+			} else {
+				// Lógica de movimiento existente
 				moveX = Math.random() > 0.5;
+				x = moveX ? Math.round(Math.random() * 2 - 1) : 0;
+				y = moveX ? 0 : Math.round(Math.random() * 2 - 1);
+			}
 
-			x = moveX ? Math.round(Math.random() * 2 - 1) : 0;
-			y = moveX ? 0 : Math.round(Math.random() * 2 - 1);
-
-			console.log(cycles, "- Agente", x, y, `[${agl.x},${agl.y}] =>[${agl.x + x},${agl.y + y}], Turn: ${turn}`);
 			cycles++;
-			console.log(
-				// Expresión para evitar que el agente se mantenga quieto y se salga del tablero
-				(x == 0 && y == 0) || (x + agl.x) < 0 || (y + agl.y) < 0 || (x + agl.x) > 4 || (y + agl.y) > 4,
-				// Expresión para evitar que el agente entre a los pozos
-				(x + agl.x === well.x && y + agl.y === well.y) || (x + agl.x === secondWell.x && y + agl.y === secondWell.y),
-				// Expresión para evitar que el agente se acerque a Gumpy, para que se aleje
-				(isGumpyNear && (agl.x < gumpy.x && x > 0 || agl.x > gumpy.x && x < 0 || agl.y < gumpy.y && y > 0 || agl.y > gumpy.y && y < 0) && turn % 2 == 0),
-				// Expresión para evitar que el agente se aleje del tesoro si gumpy no está cerca
-				(isTreasureNear && !isGumpyNear && (agl.x < treasure.x && x < 0 || agl.x > treasure.x && x > 0 || agl.y < treasure.y && y < 0 || agl.y > treasure.y && y > 0) && !isWellNear && !isSecondWellNear)
-			);
 		} while (
-			// Expresión para evitar que el agente se mantenga quieto y se salga del tablero
+			// Condiciones existentes...
 			(x == 0 && y == 0) || (x + agl.x) < 0 || (y + agl.y) < 0 || (x + agl.x) > 4 || (y + agl.y) > 4 ||
-			// Expresión para evitar que el agente entre a los pozos
 			(x + agl.x === well.x && y + agl.y === well.y) || (x + agl.x === secondWell.x && y + agl.y === secondWell.y) ||
-			// Expresión para evitar que el agente se acerque a Gumpy, para que se aleje
-			(isGumpyNear && (agl.x < gumpy.x && x > 0 || agl.x > gumpy.x && x < 0 || agl.y < gumpy.y && y > 0 || agl.y > gumpy.y && y < 0) && turn % 2 == 0) ||
-			// Expresión para evitar que el agente se aleje del tesoro si gumpy no está cerca
-			(isTreasureNear && !isGumpyNear && (agl.x < treasure.x && x < 0 || agl.x > treasure.x && x > 0 || agl.y < treasure.y && y < 0 || agl.y > treasure.y && y > 0) && (
-				isWellNear && (well.x == x + agl.x && well.y == y + agl.y) || isSecondWellNear && (secondWell.x == x + agl.x && secondWell.y == y + agl.y)
-			))
+			(isGumpyNear && (agl.x < gumpy.x && x > 0 || agl.x > gumpy.x && x < 0 || agl.y < gumpy.y && y > 0 || agl.y > gumpy.y && y < 0) && turn % 2 == 0)
 		);
 
 		if (agl.x + x === treasure.x && agl.y + y === treasure.y) {
@@ -290,11 +291,7 @@ export const App = () => {
 												{treasure.x === x && treasure.y === y ? "🎁" : ""}
 												{well.x === x && well.y === y ? "🌀" : ""}
 												{secondWell.x === x && secondWell.y === y ? "🌀" : ""}
-												{gumpy.x === x && gumpy.y === y ?
-													<div className="flex justify-center items-center">
-														<img src={base64image} className="w-1/2" alt="Gumpy Image" />
-													</div>
-													: ""}
+												{gumpy.x === x && gumpy.y === y ? "👹": ""}
 											</p>
 											<button ></button>
 										</div>
