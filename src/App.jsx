@@ -1,3 +1,10 @@
+/*
+Integrantes
+Arturo Misael Álvarez Gutiérrez 	20550369
+Adrián Corral Quezada				20550363
+Elian Ramiro Gerard Ramos			20550362
+Jesús Adán Salazar Campos			20550365
+*/
 import { useEffect, useRef, useState } from "react"
 
 const initializeLocation = () => {
