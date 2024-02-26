@@ -49,7 +49,7 @@ export const App = () => {
 				setTurn(turn => turn + 1);
 			}, gameSpeed);
 	}, [turn, pause]);
-
+	//Funcion para añadir un log
 	const addLog = (log, style) => {
 		const date = new Date();
 		logs.unshift({ content: date.toLocaleString() + " - " + log, style });
@@ -58,12 +58,12 @@ export const App = () => {
 	const moveAgl = () => {
 		let x, y, score = agl.score - 1;
 		let cycles = 0;
-
+		//Variales de control del agente
 		let isGumpyNear = (gumpy.x === agl.x || gumpy.x === agl.x + 1 || gumpy.x === agl.x - 1) && (gumpy.y === agl.y || gumpy.y === agl.y - 1 || gumpy.y === agl.y + 1);
 		let isWellNear = (well.x === agl.x || well.x === agl.x + 1 || well.x === agl.x - 1) && (well.y === agl.y || well.y === agl.y - 1 || well.y === agl.y + 1);
 		let isSecondWellNear = (secondWell.x === agl.x || secondWell.x === agl.x + 1 || secondWell.x === agl.x - 1) && (secondWell.y === agl.y || secondWell.y === agl.y - 1 || secondWell.y === agl.y + 1);
 		let isTreasureNear = (treasure.x === agl.x || treasure.x === agl.x + 1 || treasure.x === agl.x - 1) && (treasure.y === agl.y || treasure.y === agl.y - 1 || treasure.y === agl.y + 1);
-
+		//Añadir logs del agente
 		if (isGumpyNear)
 			addLog("El agente ha detectado a Gumpy en: " + gumpy.x + ":" + gumpy.y, { color: "#369c36" });
 
@@ -83,6 +83,7 @@ export const App = () => {
 			}
 
 			let moveX;
+			//Expresion para saber si el agente puede ir por el tesoro
 			let safeMoveToTreasure = isTreasureNear && !(
 				(agl.x === treasure.x - 1 && agl.y === treasure.y - 1) && (well.x === treasure.x - 1 && well.y === treasure.y) && (secondWell.x === treasure.x && secondWell.y === treasure.y - 1) || // Esquina superior izquierda
 				(agl.x === treasure.x + 1 && agl.y === treasure.y - 1) && (well.x === treasure.x && well.y === treasure.y - 1) && (secondWell.x === treasure.x + 1 && secondWell.y === treasure.y) || // Esquina superior derecha
@@ -128,9 +129,13 @@ export const App = () => {
 
 			cycles++;
 		} while (
+			//Expresion para que el agente no se quede inmovil ni se salga el tablero
 			(x == 0 && y == 0) || (x + agl.x) < 0 || (y + agl.y) < 0 || (x + agl.x) > 4 || (y + agl.y) > 4 ||
+			//Expresion para que el agente evite los posoz
 			(x + agl.x === well.x && y + agl.y === well.y) || (x + agl.x === secondWell.x && y + agl.y === secondWell.y) ||
-			(isGumpyNear && (agl.x < gumpy.x && x > 0 || agl.x > gumpy.x && x < 0 || agl.y < gumpy.y && y > 0 || agl.y > gumpy.y && y < 0) && turn % 2 == 0)
+			//Expresiones para que el agente evite a Gumpy
+			(isGumpyNear && (agl.x < gumpy.x && x > 0 || agl.x > gumpy.x && x < 0 || agl.y < gumpy.y && y > 0 || agl.y > gumpy.y && y < 0) && turn % 2 == 0) ||
+			(x + agl.x === gumpy.x && y + agl.y === gumpy.y)
 		);
 
 		if (agl.x + x === treasure.x && agl.y + y === treasure.y) {
@@ -156,15 +161,15 @@ export const App = () => {
 			score
 		};
 	}
-
+	//Funcion para mover a Gumpy
 	const moveGumpy = () => {
 		let x, y;
-
+		//Variables de control de Gumpy
 		let isAglNear = (agl.x === gumpy.x || agl.x === gumpy.x + 1 || agl.x === gumpy.x - 1) && (agl.y === gumpy.y || agl.y === gumpy.y - 1 || agl.y === gumpy.y + 1);
 		let isWellNear = (well.x === gumpy.x || well.x === gumpy.x + 1 || well.x === gumpy.x - 1) && (well.y === gumpy.y || well.y === gumpy.y - 1 || well.y === gumpy.y + 1);
 		let isSecondWellNear = (secondWell.x === gumpy.x || secondWell.x === gumpy.x + 1 || secondWell.x === gumpy.x - 1) && (secondWell.y === gumpy.y || secondWell.y === gumpy.y - 1 || secondWell.y === gumpy.y + 1);
 		let isTreasureNear = (treasure.x === gumpy.x || treasure.x === gumpy.x + 1 || treasure.x === gumpy.x - 1) && (treasure.y === gumpy.y || treasure.y === gumpy.y - 1 || treasure.y === gumpy.y + 1);
-
+		//Añadir logs de detección de Gumpy
 		if (isAglNear)
 			addLog("Gumpy ha detectado al agente en: " + agl.x + ":" + agl.y, { color: "#5d369c" });
 
@@ -208,9 +213,9 @@ export const App = () => {
 			(x + gumpy.x === well.x && y + gumpy.y === well.y) || (x + gumpy.x === secondWell.x && y + gumpy.y === secondWell.y) ||
 			(isAglNear && (gumpy.x < agl.x && x < 0 || gumpy.x > agl.x && x > 0 || gumpy.y < agl.y && y < 0 || gumpy.y > agl.y && y > 0) && !isWellNear && !isSecondWellNear && !isTreasureNear) ||
 			//Expresión para que Gumpy evite el tesoro
-			(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y) || 
+			(x + gumpy.x === treasure.x && y + gumpy.y === treasure.y) //|| 
 			//Expresión para que Gumpy evite los pozos si va a ir hacia el agente
-			(isAglNear && isSafeToMoveToAgl)
+			//(isAglNear && isSafeToMoveToAgl)
 		);
 
 		if (!pause)
@@ -219,19 +224,19 @@ export const App = () => {
 				y: gumpy.y + y
 			};
 	}
-
+	//Finalizar juego
 	const endGame = () => {
 		addLog("Fin del juego", { color: "#FF0000", fontWeight: "bold" });
 		clearTimeout(timer);
 		setPause(true);
 	}
-
+	//Reiniciar
 	const restart = () => {
 		logs = [];
 		clearTimeout(timer);
 		agl = { x: 0, y: 0, score: 0 };
 		setPause(false);
-
+		//Establecer obstaculos en el tablero
 		do {
 			well = initializeLocation()
 			secondWell = initializeLocation()
