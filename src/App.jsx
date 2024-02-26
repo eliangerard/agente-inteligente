@@ -160,6 +160,7 @@ export const App = () => {
 			y: agl.y + y,
 			score
 		};
+		addLog("El agente se movió a: [" + agl.x + ":" + agl.y + "]", { color: "#369c36" });
 	}
 	//Funcion para mover a Gumpy
 	const moveGumpy = () => {
@@ -223,6 +224,7 @@ export const App = () => {
 				x: gumpy.x + x,
 				y: gumpy.y + y
 			};
+			addLog("Gumpy se movió a: [" + gumpy.x + ":" + gumpy.y + "]", { color: "#5d369c" });
 	}
 	//Finalizar juego
 	const endGame = () => {
