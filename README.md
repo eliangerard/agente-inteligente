@@ -1,6 +1,6 @@
 # Agente Inteligente
 
-## Instrucciones para correrlo
+## Instrucciones para su ejecucion
 Ejecutar lo siguiente en una terminal dentro del directorio del proyecto `agente-inteligente`:
 
 Instalar paquetes (Solo la primera vez):
